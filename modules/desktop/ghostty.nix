@@ -11,7 +11,7 @@
 
     # The source `ghostty` package is unavailable on darwin; use the official
     # binary repack there.
-    package = if pkgs.stdenv.isDarwin then pkgs.ghostty-bin else pkgs.ghostty;
+    package = if pkgs.stdenv.hostPlatform.isDarwin then pkgs.ghostty-bin else pkgs.ghostty;
 
     settings = {
       # Font configuration

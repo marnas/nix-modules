@@ -12,9 +12,12 @@
     # On macOS, Firefox is installed via Homebrew cask (hosts/macos/brew.nix);
     # the nixpkgs package isn't cached for aarch64-darwin and would build from
     # source. null lets home-manager manage the profile/policies only.
-    package = lib.mkIf pkgs.stdenv.isDarwin null;
+    package = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin null;
     configPath =
-      if pkgs.stdenv.isDarwin then "Library/Application Support/Firefox" else ".mozilla/firefox";
+      if pkgs.stdenv.hostPlatform.isDarwin then
+        "Library/Application Support/Firefox"
+      else
+        ".mozilla/firefox";
 
     # Enable arkenfox privacy and security settings
     arkenfox = {

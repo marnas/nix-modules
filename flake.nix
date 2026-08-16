@@ -70,7 +70,6 @@
         fish = ./modules/cli/fish.nix;
         starship = ./modules/cli/starship.nix;
         tmux = ./modules/cli/tmux.nix; # needs overlays.additions (tmux plugins)
-        yazi = ./modules/cli/yazi.nix;
         zsh = ./modules/cli/zsh.nix;
         # All cli modules in one import.
         cli = {
@@ -80,7 +79,6 @@
             fish
             starship
             tmux
-            yazi
             zsh
           ];
         };

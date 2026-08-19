@@ -58,6 +58,8 @@
       # };
 
       windowrule = [
+        # Don't let swayidle lock/dpms while any window is fullscreen
+        "idle_inhibit fullscreen, match:class .*"
         # Hide ghost XWayland window created by xembedsniproxy
         "opacity 0.0 override, match:xwayland 1, match:class ^$, match:title ^$"
         "no_blur on, match:xwayland 1, match:class ^$, match:title ^$"

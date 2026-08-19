@@ -6,7 +6,8 @@ let
   lockCommand = "${swaylock} --screenshots --effect-blur 7x5 --fade-in 0.2 --font Roboto --font-size 20 -f";
   dpmsOff = "${pkgs.hyprland}/bin/hyprctl dispatch dpms off";
   dpmsOn = "${pkgs.hyprland}/bin/hyprctl dispatch dpms on";
-  isLocked = "${pgrep} -x ${swaylock}";
+  # pgrep -x matches the 15-char comm field, so pass the bare name, not the store path
+  isLocked = "${pgrep} -x swaylock";
 in
 {
   services.swayidle = {

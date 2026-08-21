@@ -10,14 +10,20 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # v0.56.2 locks a glaze-8 nixpkgs while its CMake still requires glaze 7
+    # (relaxed on main in 91f29f23, not cherry-picked into the tag), so the nix
+    # build is broken as released. Pin the v0.56.1-era nixpkgs (glaze 7.9) for
+    # the hyprland stack. At the next tag bump, drop this input and the follows
+    # below: normally hyprland must NOT follow any nixpkgs, or it forces a
+    # source rebuild and loses the hyprland.cachix.org binary cache.
+    hyprland-nixpkgs.url = "github:nixos/nixpkgs/61b7c44c4073f0b827768aff0049561b5110ea5a";
     hyprland = {
-      # Do NOT set inputs.nixpkgs.follows: it forces a source rebuild and loses
-      # the hyprland.cachix.org binary cache (upstream warns against it).
-      url = "git+https://github.com/hyprwm/Hyprland?submodules=1&ref=refs/tags/v0.55.2";
+      url = "git+https://github.com/hyprwm/Hyprland?submodules=1&ref=refs/tags/v0.56.2";
+      inputs.nixpkgs.follows = "hyprland-nixpkgs";
     };
 
     split-monitor-workspaces = {
-      url = "github:zjeffer/split-monitor-workspaces?submodules=1&ref=refs/tags/v0.55.1";
+      url = "github:zjeffer/split-monitor-workspaces?submodules=1&ref=refs/tags/v0.56.2";
       inputs.hyprland.follows = "hyprland";
     };
 

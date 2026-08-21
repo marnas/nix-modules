@@ -1,9 +1,25 @@
 {
   pkgs,
+  lib,
   nixModulesInputs,
   config,
   ...
 }:
+let
+  # Load plugins at config-parse time through a sourced `plugin =` line
+  # instead of the HM `plugins` option: that option emits
+  # `exec-once = hyprctl plugin load`, which runs only after the config is
+  # parsed, so every bind using a plugin dispatcher (split-workspace, ...)
+  # errors on the startup overlay. sourceFirst (default true) hoists the
+  # source line above the binds.
+  plugins = [
+    nixModulesInputs.split-monitor-workspaces.packages.${pkgs.stdenv.hostPlatform.system}.split-monitor-workspaces
+    # nixModulesInputs.hyprsplit.packages.${pkgs.stdenv.hostPlatform.system}.hyprsplit
+  ];
+  pluginLoader = pkgs.writeText "hyprland-plugins.conf" (
+    lib.concatMapStringsSep "\n" (p: "plugin = ${p}/lib/lib${p.pname}.so") plugins
+  );
+in
 {
   imports = [ ./binds.nix ];
 
@@ -15,12 +31,9 @@
     package = nixModulesInputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
     portalPackage =
       nixModulesInputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
-    plugins = [
-      nixModulesInputs.split-monitor-workspaces.packages.${pkgs.stdenv.hostPlatform.system}.split-monitor-workspaces
-      # nixModulesInputs.hyprsplit.packages.${pkgs.stdenv.hostPlatform.system}.hyprsplit
-    ];
-
     settings = {
+      source = [ "${pluginLoader}" ];
+
       env = [
         "XDG_CURRENT_DESKTOP,Hyprland"
         "XDG_SESSION_TYPE,wayland"

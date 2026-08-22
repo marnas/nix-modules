@@ -222,6 +222,9 @@ in
         }
       ];
 
+      # Everything in the start hook: top-level hl.exec_cmd runs at config
+      # parse time, which at boot is before the compositor is up (spawned
+      # clients die without a Wayland socket).
       on = [
         {
           _args = [
@@ -230,16 +233,12 @@ in
               function()
                 hl.exec_cmd("1password --silent")
                 hl.exec_cmd("fcitx5 --replace -d --disable classicui")
+                hl.exec_cmd("${pkgs.swaybg}/bin/swaybg -o DP-1 -i ${config.home.homeDirectory}/Pictures/wallpapers/Ocean_Spray_-_MacBook_Wallpaper.jpg --mode fill")
+                hl.exec_cmd("${pkgs.swaybg}/bin/swaybg -o DP-2 -i ${config.home.homeDirectory}/Pictures/wallpapers/Wallpaper2.jpg --mode fill")
+                hl.exec_cmd("hyprctl setcursor ${config.gtk.cursorTheme.name} ${toString config.gtk.cursorTheme.size}")
               end'')
           ];
         }
-      ];
-
-      # Top-level exec_cmd re-runs on every config reload (old `exec` semantics)
-      exec_cmd = [
-        "${pkgs.swaybg}/bin/swaybg -o DP-1 -i ${config.home.homeDirectory}/Pictures/wallpapers/Ocean_Spray_-_MacBook_Wallpaper.jpg --mode fill"
-        "${pkgs.swaybg}/bin/swaybg -o DP-2 -i ${config.home.homeDirectory}/Pictures/wallpapers/Wallpaper2.jpg --mode fill"
-        "hyprctl setcursor ${config.gtk.cursorTheme.name} ${toString config.gtk.cursorTheme.size}"
       ];
     };
 

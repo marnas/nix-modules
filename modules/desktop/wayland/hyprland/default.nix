@@ -10,6 +10,11 @@ let
   # Pure-Lua split-monitor-workspaces library (upstream deprecated the C++
   # plugin); required and set up in extraConfig below.
   smwSrc = nixModulesInputs.split-monitor-workspaces;
+  # Keyboard layout comes from the HM-native home.keyboard option so hosts
+  # declare it once; plain US when unset.
+  keyboard = config.home.keyboard;
+  kbLayout = if keyboard == null || keyboard.layout == null then "us" else keyboard.layout;
+  kbVariant = if keyboard == null || keyboard.variant == null then "" else keyboard.variant;
 in
 {
   imports = [ ./binds.nix ];
@@ -116,8 +121,8 @@ in
         };
 
         input = {
-          kb_layout = "us";
-          kb_variant = "altgr-intl";
+          kb_layout = kbLayout;
+          kb_variant = kbVariant;
           follow_mouse = 1;
           touchpad = {
             natural_scroll = true;

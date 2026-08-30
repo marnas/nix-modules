@@ -15,7 +15,14 @@
       extraPortals = [
         pkgs.xdg-desktop-portal-gtk
       ];
-      config.common.default = "*";
+      # Hyprland session: screencast/shortcuts via the Hyprland backend, file
+      # chooser & the rest via GTK. Don't use "*": with the GNOME session also
+      # installed it picks xdg-desktop-portal-gnome for FileChooser, which (v50+)
+      # delegates to Nautilus and silently fails when Nautilus isn't installed.
+      config.hyprland.default = [
+        "hyprland"
+        "gtk"
+      ];
     };
 
     configFile."mimeapps.list".force = true;

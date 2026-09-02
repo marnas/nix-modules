@@ -1,5 +1,4 @@
 {
-  pkgs,
   lib,
   config,
   ...
@@ -54,15 +53,14 @@ in
       gdf = mkIf hasGit "git diff :!flake.lock";
 
     };
-    plugins = [
-      {
-        name = "z";
-        src = pkgs.fishPlugins.z.src;
-      }
-    ];
     functions = {
       # Disable greeting
       fish_greeting = "";
+
+      # Replaces fishPlugins.z: frecency jumps were only ever used to reach
+      # the dotfiles repo, and anything else they guessed was a misfire.
+      # Deterministic instead; any arguments are deliberately ignored.
+      z = "cd ~/.dotfiles";
 
       # Delete all local branches except main/master
       gbclean = ''
@@ -77,6 +75,10 @@ in
       '';
     };
     interactiveShellInit = ''
+      # cd (and its tab-completion) also resolves against these roots, so
+      # `cd Downloads` works from anywhere. Global, not exported: an exported
+      # CDPATH changes `cd` semantics inside child bash/sh scripts.
+      set -g CDPATH . ~ ~/workspace
       bind \ey edit_command_buffer
       fish_vi_key_bindings
       set fish_cursor_default block blink

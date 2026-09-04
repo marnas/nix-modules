@@ -1,4 +1,29 @@
-{ pkgs, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
+let
+  # Variables the whole graphical session needs, not only shells.
+  # home.sessionVariables is only sourced by interactive shells; GDM starts
+  # Hyprland from the bare PAM environment, so apps launched from a Hyprland
+  # bind (tofi, terminal keybind) miss them unless Hyprland exports them via
+  # `env`. Symptom: a Qt app without QT_QPA_PLATFORM falls back to xcb, runs
+  # under XWayland and never reaches fcitx5.
+  # IM variables follow https://fcitx-im.org/wiki/Using_Fcitx_5_on_Wayland
+  # (wlroots/Sway section): Qt6 prefers the compositor's text-input with the
+  # fcitx module as fallback, Qt5 uses the fcitx module, XMODIFIERS covers
+  # XWayland clients.
+  sessionVars = {
+    MOZ_ENABLE_WAYLAND = "1";
+    QT_QPA_PLATFORM = "wayland";
+    GTK_IM_MODULE = "fcitx";
+    QT_IM_MODULE = "fcitx";
+    QT_IM_MODULES = "wayland;fcitx";
+    XMODIFIERS = "@im=fcitx";
+  };
+in
 {
   imports = [
     ./hyprland
@@ -27,17 +52,23 @@
 
     configFile."mimeapps.list".force = true;
 
-    # fcitx5 writes its own ~/.config/fcitx5/config; force-manage just the
-    # trigger keys to drop the default Control+space (now handled by the
-    # Hyprland keybind so the waybar indicator updates event-driven, see
-    # hyprland/binds.nix). All other fcitx5 options keep their compiled
-    # defaults — only this list is overridden.
+    # fcitx5 writes its own ~/.config/fcitx5/config; force-manage just two
+    # things, everything else keeps its compiled default:
+    # - trigger keys: drop the default Control+space (handled by the Hyprland
+    #   keybind so the waybar indicator updates event-driven, see
+    #   hyprland/binds.nix).
+    # - ShareInputState=All: one global active-IM state instead of fcitx5's
+    #   default per-window state, so a Ctrl+space toggle (and the waybar
+    #   indicator) applies to every app, not only the window that was focused.
     configFile."fcitx5/config" = {
       force = true;
       text = ''
         [Hotkey/TriggerKeys]
         0=Zenkaku_Hankaku
         1=Hangul
+
+        [Behavior]
+        ShareInputState=All
       '';
     };
     mimeApps = {
@@ -88,14 +119,16 @@
       ydotool
     ];
 
-    sessionVariables = {
-      MOZ_ENABLE_WAYLAND = 1;
-      QT_QPA_PLATFORM = "wayland";
+    sessionVariables = sessionVars // {
       LIBSEAT_BACKEND = "logind";
-      GTK_IM_MODULE = "fcitx";
-      QT_IM_MODULE = "fcitx";
-      XMODIFIERS = "@im=fcitx";
       NIX_PROFILES = "${config.home.homeDirectory}/.nix-profile /nix/var/nix/profiles/default";
     };
   };
+
+  wayland.windowManager.hyprland.settings.env = lib.mapAttrsToList (name: value: {
+    _args = [
+      name
+      value
+    ];
+  }) sessionVars;
 }

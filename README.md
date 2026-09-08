@@ -11,7 +11,7 @@ My neovim setup lives in its own flake: [nvim-flake](https://github.com/marnas/n
   - `wayland` — Hyprland (split-monitor-workspaces), waybar, tofi, mako, swayidle
   - `firefox` — [arkenfox](https://github.com/arkenfox/user.js)-hardened profile with telemetry off, privacy extensions preinstalled
   - `alacritty`, `ghostty`, `kitty`, `gtk`, `qt`
-- **`packages`** — `tilish-colemak` (Colemak fork of tmux-tilish), `tmux-agent-indicator`, `claude-usage` (Claude usage-window widget for the tmux status bar)
+- **`packages`** — `tilish-colemak` (Colemak fork of tmux-tilish), `tmux-agent-indicator`, `claude-usage` (Claude usage-window widget for the tmux status bar), `claude-tasks` (live full-length view of Claude Code's task list, for a tmux side pane)
 - **`overlays`** — `additions` (the packages above), `stable-packages` (`pkgs.stable.*` escape hatch)
 
 ## Usage

@@ -38,6 +38,11 @@ in
         else
           ".mozilla/firefox";
 
+      # Always save to ~/Downloads, never ask. A policy (not a profile pref)
+      # because it locks browser.download.dir/folderList/useDownloadDir, which
+      # beats arkenfox 2651 (useDownloadDir=false, "always ask") in user.js.
+      policies.DownloadDirectory = "${config.home.homeDirectory}/Downloads";
+
       # Enable arkenfox privacy and security settings
       arkenfox = {
         enable = true;
@@ -148,9 +153,6 @@ in
           "trailhead.firstrun.didSeeAboutWelcome" = true;
           "browser.bookmarks.restore_default_bookmarks" = false;
           "browser.bookmarks.addedImportButton" = true;
-
-          # Don't ask for download dir
-          "browser.download.useDownloadDir" = false;
 
           # Disable crappy home activity stream page
           "browser.newtabpage.activity-stream.feeds.topsites" = false;

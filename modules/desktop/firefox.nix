@@ -25,7 +25,14 @@ in
   };
 
   config = {
-    programs.browserpass.enable = true;
+    programs.browserpass = {
+      enable = true;
+      # macOS: Firefox only. The default also drops native-messaging hosts and
+      # policy files into Chrome's and Brave's data dirs; on macOS 27 those are
+      # TCC-protected (App Data), so home-manager's symlinking fails with EPERM.
+      # Linux keeps the default so chromium (programs.chromium) stays covered.
+      browsers = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin [ "firefox" ];
+    };
     programs.firefox = {
       enable = true;
       # On macOS, Firefox is installed via Homebrew cask (hosts/macos/brew.nix);

@@ -80,6 +80,11 @@ in
         sed -i 's/^\(\s*\)hscrollbar-policy: never;$/\1hscrollbar-policy: never;\n\1max-content-height: 560;/' data/ui/notifications_widget.blp
         grep -q 'max-content-height: 960' data/ui/control_center.blp
         grep -q 'max-content-height: 560' data/ui/notifications_widget.blp
+        # The list is pinned to the top of its viewport in code; centre it so
+        # one or two cards sit in the middle of the height floor (CSS below)
+        # instead of leaving a gap underneath. Taller lists fill and scroll.
+        sed -i 's/list_box.set_valign (Gtk.Align.START);/list_box.set_valign (Gtk.Align.CENTER);/' src/controlCenter/widgets/notifications/notifications.vala
+        grep -q 'list_box.set_valign (Gtk.Align.CENTER);' src/controlCenter/widgets/notifications/notifications.vala
       '';
     });
     settings = {
@@ -553,11 +558,14 @@ in
       /* The empty state and the list are two stack pages, each sized to its
          own content; pin both to one floor so the panel never gets shorter
          with one notification than with none. It only grows from here. */
-      .control-center scrolledwindow,
-      .control-center .control-center-list-placeholder {
+      .control-center scrolledwindow {
         min-height: 108px;
       }
+      /* Same 108px total; the top padding offsets the bell's negative
+         margins so the icon + label group sits on the true centre. */
       .control-center .control-center-list-placeholder {
+        min-height: 88px;
+        padding: 20px 0 0 0;
         opacity: 0.3;
         margin: 0;
       }

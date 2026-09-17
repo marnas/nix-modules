@@ -25,18 +25,7 @@ in
         # notification/dnd change; the state lands in the CSS class
         # (none | notification | dnd-none | dnd-notification | inhibited-*).
         "custom/notification" = {
-          format = "{icon}";
-          # Bell: outline idle, filled when unread, crossed under Do Not Disturb
-          format-icons = {
-            none = "󰂜";
-            notification = "󰂚";
-            inhibited-none = "󰂜";
-            inhibited-notification = "󰂚";
-            dnd-none = "󰪑";
-            dnd-notification = "󰪑";
-            dnd-inhibited-none = "󰪑";
-            dnd-inhibited-notification = "󰪑";
-          };
+          format = "";
           return-type = "json";
           exec = "${swaync-client} -swb";
           on-click = "${swaync-client} -t -sw";
@@ -152,26 +141,27 @@ in
       window .modules-right #clock{
         border: none;
         padding: 0 0;
-        margin: 0 4px;
+        margin: 0 8px;
       }
 
       window #custom-separator {
         color: #727072;
+        margin: 0 2px;
       }
 
       window #tray {
-        margin: 0 5px;
+        margin: 0 8px;
       }
 
       window #custom-fcitx5 {
-        margin: 0 4px;
+        margin: 0 8px;
         min-width: 18px;
         font-size: 12px;
       }
 
       window #custom-notification {
-        margin: 0 4px;
-        font-size: 15px;
+        margin: 0 8px;
+        font-size: 14px;
       }
       window #custom-notification.notification,
       window #custom-notification.inhibited-notification {

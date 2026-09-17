@@ -1,4 +1,7 @@
-{ ... }:
+{ lib, config, ... }:
+let
+  swaync-client = lib.getExe' config.services.swaync.package "swaync-client";
+in
 {
 
   programs.waybar = {
@@ -14,8 +17,33 @@
           "custom/separator"
           "pulseaudio"
           "custom/separator"
+          "custom/notification"
+          "custom/separator"
           "clock"
         ];
+        # Control-center toggle. `swaync-client -swb` streams JSON on every
+        # notification/dnd change; the state lands in the CSS class
+        # (none | notification | dnd-none | dnd-notification | inhibited-*).
+        "custom/notification" = {
+          format = "{icon}";
+          # Bell: outline idle, filled when unread, crossed under Do Not Disturb
+          format-icons = {
+            none = "󰂜";
+            notification = "󰂚";
+            inhibited-none = "󰂜";
+            inhibited-notification = "󰂚";
+            dnd-none = "󰪑";
+            dnd-notification = "󰪑";
+            dnd-inhibited-none = "󰪑";
+            dnd-inhibited-notification = "󰪑";
+          };
+          return-type = "json";
+          exec = "${swaync-client} -swb";
+          on-click = "${swaync-client} -t -sw";
+          on-click-right = "${swaync-client} -d -sw";
+          escape = true;
+          tooltip = false;
+        };
         "hyprland/workspaces" = {
           format = "{icon}";
           disable-scroll = true;
@@ -139,6 +167,21 @@
         margin: 0 4px;
         min-width: 18px;
         font-size: 12px;
+      }
+
+      window #custom-notification {
+        margin: 0 4px;
+        font-size: 15px;
+      }
+      window #custom-notification.notification,
+      window #custom-notification.inhibited-notification {
+        color: #ffd866;
+      }
+      window #custom-notification.dnd-none,
+      window #custom-notification.dnd-notification,
+      window #custom-notification.dnd-inhibited-none,
+      window #custom-notification.dnd-inhibited-notification {
+        color: #727072;
       }
     '';
   };

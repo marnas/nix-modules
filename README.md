@@ -8,7 +8,7 @@ My neovim setup lives in its own flake: [nvim-flake](https://github.com/marnas/n
 
 - **`homeManagerModules`**
   - `cli` — fish, tmux (tilish + agent-indicator + usage widget), starship, bat, eza, yazi, zsh
-  - `wayland` — Hyprland (split-monitor-workspaces), waybar, tofi, mako, swayidle
+  - `wayland` — Hyprland (split-monitor-workspaces), waybar, tofi, swaync, swayidle
   - `firefox` — [arkenfox](https://github.com/arkenfox/user.js)-hardened profile with telemetry off, privacy extensions preinstalled
   - `alacritty`, `ghostty`, `kitty`, `gtk`, `qt`
 - **`packages`** — `tilish-colemak` (Colemak fork of tmux-tilish), `tmux-agent-indicator`, `claude-usage` (Claude usage-window widget for the tmux status bar), `claude-tasks` (live full-length view of Claude Code's task list, for a tmux side pane)

@@ -29,7 +29,7 @@ in
     ./hyprland
     ./waybar.nix
     ./tofi.nix
-    ./mako.nix
+    ./swaync.nix
     ./swayidle.nix
 
   ];

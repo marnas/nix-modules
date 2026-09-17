@@ -212,10 +212,21 @@ in
       ];
 
       layer_rule = [
+        # mako (module kept on disk, not imported)
         {
           match.namespace = "notifications";
           blur = true;
           ignore_alpha = 0;
+        }
+        # swaync control center: frosted glass (the CSS bg is translucent).
+        # The surface covers the whole output (transparent click-catcher), so
+        # blur only pixels above a real alpha, not the invisible backdrop.
+        # Popups (swaync-notification-window) are solid on purpose: blur over
+        # a light page washes them out.
+        {
+          match.namespace = "swaync-control-center";
+          blur = true;
+          ignore_alpha = 0.3;
         }
       ];
 

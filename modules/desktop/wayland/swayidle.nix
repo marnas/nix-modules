@@ -47,6 +47,8 @@ in
       }
     ];
     events = {
+      # `loginctl lock-session` (control-center Lock button, swaync.nix)
+      lock = "${lockCommand}";
       before-sleep = "${lockCommand}";
       after-resume = "${dpmsOn}";
     };

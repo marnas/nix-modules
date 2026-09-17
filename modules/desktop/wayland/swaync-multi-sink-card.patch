@@ -1,0 +1,24 @@
+--- a/src/controlCenter/widgets/volume/pulseDaemon.vala
++++ b/src/controlCenter/widgets/volume/pulseDaemon.vala
+@@ -375,6 +375,21 @@
+             bool found = false;
+             foreach (PulseDevice device in sinks.values) {
+                 if (device.card_index == info.card) {
++                    // A card can expose several sinks at once (speakers,
++                    // headphones, S/PDIF...). Only touch devices whose port
++                    // belongs to THIS sink; otherwise the last sink
++                    // enumerated overwrites name/index on every device of
++                    // the card and volume changes land on the wrong sink.
++                    bool owns_port = false;
++                    foreach (var port in info.ports) {
++                        if (port->name == device.port_name) {
++                            owns_port = true;
++                            break;
++                        }
++                    }
++                    if (!owns_port) {
++                        continue;
++                    }
+                     // Sets the name and index to profiles that aren't active
+                     // Ex: The HDMI audio port that's not active
+                     device.device_name = info.name;

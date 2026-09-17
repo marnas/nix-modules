@@ -141,20 +141,19 @@ in
       window .modules-right #clock{
         border: none;
         padding: 0 0;
-        margin: 0 8px;
+        margin: 0 4px;
       }
 
       window #custom-separator {
         color: #727072;
-        margin: 0 2px;
       }
 
       window #tray {
-        margin: 0 8px;
+        margin: 0 5px;
       }
 
       window #custom-fcitx5 {
-        margin: 0 8px;
+        margin: 0 4px;
         min-width: 18px;
         font-size: 12px;
       }

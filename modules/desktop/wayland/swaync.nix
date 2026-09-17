@@ -553,7 +553,7 @@ in
       /* The empty state and the list are two stack pages, each sized to its
          own content; pin both to one floor so the panel never gets shorter
          with one notification than with none. It only grows from here. */
-      .control-center scrolledwindow scrolledwindow,
+      .control-center scrolledwindow,
       .control-center .control-center-list-placeholder {
         min-height: 108px;
       }

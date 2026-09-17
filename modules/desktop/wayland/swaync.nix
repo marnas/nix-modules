@@ -550,9 +550,16 @@ in
            so 4px here keeps the cards aligned with the tiles above */
         margin: 0 4px 6px 4px;
       }
+      /* The empty state and the list are two stack pages, each sized to its
+         own content; pin both to one floor so the panel never gets shorter
+         with one notification than with none. It only grows from here. */
+      .control-center scrolledwindow scrolledwindow,
+      .control-center .control-center-list-placeholder {
+        min-height: 108px;
+      }
       .control-center .control-center-list-placeholder {
         opacity: 0.3;
-        margin: 16px 0;
+        margin: 0;
       }
       .control-center .control-center-list-placeholder image {
         -gtk-icon-transform: scale(0.5);

@@ -83,8 +83,12 @@ in
         # The list is pinned to the top of its viewport in code; centre it so
         # one or two cards sit in the middle of the height floor (CSS below)
         # instead of leaving a gap underneath. Taller lists fill and scroll.
+        # Two sites: the constructor, and the ordering code that re-applies
+        # the alignment on every update (it would undo the first one).
         sed -i 's/list_box.set_valign (Gtk.Align.START);/list_box.set_valign (Gtk.Align.CENTER);/' src/controlCenter/widgets/notifications/notifications.vala
+        sed -i 's/reversed ? Gtk.Align.END : Gtk.Align.START/reversed ? Gtk.Align.END : Gtk.Align.CENTER/' src/controlCenter/widgets/notifications/notifications.vala
         grep -q 'list_box.set_valign (Gtk.Align.CENTER);' src/controlCenter/widgets/notifications/notifications.vala
+        grep -q 'Gtk.Align.END : Gtk.Align.CENTER' src/controlCenter/widgets/notifications/notifications.vala
       '';
     });
     settings = {
@@ -614,7 +618,10 @@ in
       /* App icon: rounded square like a macOS app tile, snug to the text */
       .notification .notification-content .image {
         border-radius: 9px;
-        margin: 0 10px 0 0;
+        /* swaync resamples raw image data to the widget natural size, which
+           includes these margins: horizontal and vertical sums must match
+           or covers get stretched (6 == 3 + 3). */
+        margin: 3px 6px 3px 0;
       }
       .notification .notification-content .app-icon {
         margin: 0 4px 0 0;

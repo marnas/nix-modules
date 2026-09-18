@@ -17,8 +17,8 @@
  
 +            // Fixed-width name column so every slider starts at the same x
 +            label.set_xalign (0);
-+            label.set_width_chars (12);
-+            label.set_max_width_chars (12);
++            label.set_width_chars (8);
++            label.set_max_width_chars (8);
 +            label.set_ellipsize (Pango.EllipsizeMode.END);
 +
 +            mute_button.add_css_class ("flat");
@@ -37,7 +37,7 @@
  
              set_child (container);
  
-@@ -44,32 +60,79 @@
+@@ -44,32 +60,81 @@
                  client.set_sink_input_volume (sink_input, (float) scale.get_value ());
                  scale.tooltip_text = ((int) scale.get_value ()).to_string ();
              });
@@ -116,6 +116,8 @@
 +                    name = name.substring (0, 1).up () + name.substring (1);
 +                }
 +                label.set_text (name);
++                // Column is narrow on purpose; the full name lives in the tooltip
++                set_tooltip_text (name);
              }
  
              scale.set_value (sink_input.volume);

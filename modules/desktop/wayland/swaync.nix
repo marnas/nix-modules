@@ -104,8 +104,9 @@ in
       control-center-margin-top = 8;
       control-center-margin-right = 8;
       notification-window-width = 400;
-      # App icon / image at macOS size; the app-icon badge is a third of it.
-      notification-icon-size = 40;
+      # Cover art / app icon size (mako defaulted to a 64px max); the app-icon
+      # badge is a third of it.
+      notification-icon-size = 56;
       timeout = 15;
       timeout-low = 8;
       timeout-critical = 0;
@@ -230,7 +231,7 @@ in
         --font-size-body: 14px;
         --font-size-summary: 14px;
         --notification-shadow: none;
-        --notification-icon-size: 40px;
+        --notification-icon-size: 56px;
         --mpris-album-art-overlay: rgba(30, 28, 31, 0.6);
         --mpris-album-art-icon-size: 88px;
         --mpris-album-art-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);

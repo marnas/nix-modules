@@ -12,13 +12,13 @@ let
   # `env`. Symptom: a Qt app without QT_QPA_PLATFORM falls back to xcb, runs
   # under XWayland and never reaches fcitx5.
   # IM variables follow https://fcitx-im.org/wiki/Using_Fcitx_5_on_Wayland
-  # (wlroots/Sway section): Qt6 prefers the compositor's text-input with the
-  # fcitx module as fallback, Qt5 uses the fcitx module, XMODIFIERS covers
-  # XWayland clients.
+  # (wlroots/Sway section): GTK uses the compositor's text-input natively
+  # (GTK_IM_MODULE left unset, fcitx5 warns otherwise), Qt6 prefers it with
+  # the fcitx module as fallback, Qt5 uses the fcitx module, XMODIFIERS
+  # covers XWayland clients.
   sessionVars = {
     MOZ_ENABLE_WAYLAND = "1";
     QT_QPA_PLATFORM = "wayland";
-    GTK_IM_MODULE = "fcitx";
     QT_IM_MODULE = "fcitx";
     QT_IM_MODULES = "wayland;fcitx";
     XMODIFIERS = "@im=fcitx";

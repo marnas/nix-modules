@@ -23,7 +23,7 @@
     };
 
     split-monitor-workspaces = {
-      url = "github:zjeffer/split-monitor-workspaces?submodules=1&ref=refs/tags/v0.56.2";
+      url = "github:zjeffer/split-monitor-workspaces?ref=refs/tags/v0.56.2";
       inputs.hyprland.follows = "hyprland";
     };
 

@@ -72,6 +72,9 @@ in
       patches = (old.patches or [ ]) ++ [
         ./swaync-per-app-mute.patch
         ./swaync-multi-sink-card.patch
+        # Paused (corked) streams, e.g. every paused browser tab, are hidden
+        # from the per-app list; they reappear on resume.
+        ./swaync-hide-paused-streams.patch
       ];
       postPatch = (old.postPatch or "") + ''
         # Sheet: hard ceiling. List: grows to 560px, then scrolls on its own

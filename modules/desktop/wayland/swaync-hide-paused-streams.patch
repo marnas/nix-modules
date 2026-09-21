@@ -1,0 +1,52 @@
+--- a/src/controlCenter/widgets/volume/pulseDaemon.vala
++++ b/src/controlCenter/widgets/volume/pulseDaemon.vala
+@@ -222,6 +222,19 @@
+             uint32 id = PulseSinkInput.get_hash_map_key (info.index);
+             PulseSinkInput sink_input = null;
+             bool has_sink_input = active_sinks.has_key (id);
++
++            // Paused (corked) streams keep their sink input open, e.g. every
++            // paused browser tab. Only list streams that are actually
++            // playing: drop the row on pause; the CHANGE event fired on
++            // resume brings it back through this same path.
++            if (info.corked != 0) {
++                if (has_sink_input) {
++                    PulseSinkInput paused = active_sinks.get (id);
++                    active_sinks.unset (id);
++                    this.remove_active_sink (paused);
++                }
++                return;
++            }
+             if (has_sink_input) {
+                 sink_input = active_sinks.get (id);
+             } else {
+--- a/src/controlCenter/widgets/volume/volume.vala
++++ b/src/controlCenter/widgets/volume/volume.vala
+@@ -224,10 +224,12 @@
+         }
+ 
+         private void active_sink_added (PulseSinkInput sink) {
+-            // one element added -> remove the empty label
+-            if (this.client.active_sinks.size == 1) {
+-                var label = levels_listbox.get_first_child ();
+-                list_box_controller.remove ((Gtk.Widget) label);
++            // Remove the empty-state label if that is what the list holds.
++            // (Rows come and go often now that paused streams are hidden, so
++            // don't infer it from the map size.)
++            var first = levels_listbox.get_first_child ();
++            if (first != null && !(first is SinkInputRow)) {
++                list_box_controller.remove ((Gtk.Widget) first);
+             }
+             SinkInputRow row = new SinkInputRow (sink, client,
+                                                  icon_size, show_per_app_icon,
+@@ -247,6 +249,10 @@
+                 }
+             }
+             if (levels_listbox.get_first_child () == null) {
++                // Fresh label each time: upstream only creates it when the
++                // widget starts empty (null otherwise), and a removed one is
++                // still parented to its old row.
++                no_sink_inputs_label = new Gtk.Label (empty_label);
+                 list_box_controller.append (no_sink_inputs_label);
+             }
+         }

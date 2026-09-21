@@ -1,0 +1,47 @@
+name: Update flake.lock
+
+on:
+  schedule:
+    - cron: "0 4 * * 1" # Mondays 04:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-flake-lock
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          # Only hits once the hyprland-nixpkgs pin in flake.nix is dropped;
+          # until then the hyprland stack builds from source (~20 min).
+          extra_nix_config: |
+            extra-substituters = https://hyprland.cachix.org
+            extra-trusted-public-keys = hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=
+
+      - name: Update inputs
+        run: nix flake update
+
+      # The lock is only pushed if the demo configuration still builds against
+      # the new inputs; a red run means something (e.g. a swaync patch) needs
+      # attention before the bump can land.
+      - name: Build demo configuration
+        run: nix build --no-link --print-build-logs .#homeConfigurations.demo.activationPackage
+
+      - name: Push flake.lock
+        run: |
+          if git diff --quiet -- flake.lock; then
+            echo "flake.lock already up to date"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "build(flake): update flake.lock" -- flake.lock
+          git push

@@ -51,9 +51,9 @@ in
           # Status format MUST be set here, before agent-indicator loads, so its
           # token-substitution pass rewrites #{agent_*} into the script calls.
           # If set inside minimal-tmux-status's extraConfig it lands too late.
-          # The #(...) usage widget (Claude 5h-block % + reset, shared across all
-          # panes) is left untouched by that pass and evaluated by tmux itself on
-          # each status redraw — see pkgs/claude-usage.
+          # The #(...) usage widget (Claude 5h-block % + reset, per-model weekly
+          # caps; shared across all panes) is left untouched by that pass and
+          # evaluated by tmux itself on each status redraw — see pkgs/claude-usage.
           set -g @minimal-tmux-status-right '#{agent_session_dots} #{agent_indicator} #[fg=#EBCB8B]#(${pkgs.claude-usage}/bin/claude-usage)#[default] #[bold]#h  '
         '';
       }
@@ -105,13 +105,13 @@ in
 
       # status-right is overridden by minimal-tmux-status via
       # @minimal-tmux-status-right (see plugin block below). Refresh it on an
-      # interval so the embedded claude-usage widget (block % + reset
+      # interval so the embedded claude-usage widget (block % + reset, per-model weekly
       # countdown) updates; these redraws are also what triggers its
       # self-refresh of the usage cache. Minute-granularity data, 15s is ample.
       set -g status-interval 15
 
       # minimal-tmux-status never sets status-right-length, so tmux's default of
-      # 40 applies — too short once the ~31-char usage widget renders, which
+      # 40 applies — too short once the ~55-char usage widget renders, which
       # truncates the rightmost field (the hostname). Give it ample room for
       # agent dots + indicator + usage + host.
       set -g status-right-length 150

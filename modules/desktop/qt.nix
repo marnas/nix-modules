@@ -1,11 +1,7 @@
-{ pkgs, ... }:
 {
   qt = {
     enable = true;
-    platformTheme.name = "gtk2";
-    style = {
-      name = "gtk2";
-      package = pkgs.qt6Packages.qt6gtk2;
-    };
+    # qt6gtk2 was removed from nixpkgs (gtk2); gtk3 is built into qtbase.
+    platformTheme.name = "gtk3";
   };
 }

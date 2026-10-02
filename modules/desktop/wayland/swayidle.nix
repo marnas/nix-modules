@@ -45,6 +45,11 @@ in
         command = "${isLocked} && ${dpmsOff}";
         resumeCommand = "${dpmsOn}";
       }
+      # ~20 min after the screens go off
+      {
+        timeout = 1800;
+        command = "${pkgs.systemd}/bin/systemctl suspend";
+      }
     ];
     events = {
       # `loginctl lock-session` (control-center Lock button, swaync.nix)

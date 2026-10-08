@@ -1,10 +1,21 @@
-{ lib, config, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 let
+  cfg = config.nixModules.waybar;
   swaync-client = lib.getExe' config.services.swaync.package "swaync-client";
+  tailscale-exit = lib.getExe pkgs.tailscale-exit;
 in
 {
+  options.nixModules.waybar.tailscale.enable = lib.mkEnableOption ''
+    a Tailscale exit-node indicator in the bar (needs overlays.additions and
+    the tailscale operator pref set to the user; see pkgs/tailscale-exit)
+  '';
 
-  programs.waybar = {
+  config.programs.waybar = {
     enable = true;
     systemd.enable = true;
     settings = [
@@ -13,6 +24,13 @@ in
         modules-left = [ "hyprland/workspaces" ];
         modules-right = [
           "tray"
+        ]
+        ++ lib.optionals cfg.tailscale.enable [
+          "custom/separator"
+          "custom/tailscale"
+        ]
+        ++ [
+          "custom/separator"
           "custom/fcitx5"
           "custom/separator"
           "pulseaudio"
@@ -21,6 +39,19 @@ in
           "custom/separator"
           "clock"
         ];
+        # Exit-node indicator: "direct" = tailnet up, no exit node; "IE Dublin"
+        # = routing through that node (class exit / exit-offline); "off" = down.
+        # Clicks go through tailscale-exit, which refreshes the module with
+        # SIGRTMIN+9; the interval only catches changes made elsewhere.
+        "custom/tailscale" = lib.mkIf cfg.tailscale.enable {
+          exec = "${tailscale-exit} status";
+          return-type = "json";
+          interval = 10;
+          signal = 9;
+          on-click = "${tailscale-exit} toggle";
+          on-click-right = "${tailscale-exit} pick";
+          on-click-middle = "${tailscale-exit} updown";
+        };
         # Control-center toggle. `swaync-client -swb` streams JSON on every
         # notification/dnd change; the state lands in the CSS class
         # (none | notification | dnd-none | dnd-notification | inhibited-*).
@@ -156,6 +187,21 @@ in
         margin: 0 4px;
         min-width: 18px;
         font-size: 12px;
+      }
+
+      /* States in the terminal's ANSI palette (ghostty.nix): green 2, red 1,
+         bright black 8. */
+      window #custom-tailscale {
+        margin: 0 4px;
+      }
+      window #custom-tailscale.exit {
+        color: #90a959;
+      }
+      window #custom-tailscale.exit-offline {
+        color: #ac4242;
+      }
+      window #custom-tailscale.down {
+        color: #6b6b6b;
       }
 
       window #custom-notification {

@@ -95,6 +95,7 @@
         gtk = ./modules/desktop/gtk.nix; # needs overlays.stable-packages
         kitty = ./modules/desktop/kitty.nix;
         qt = ./modules/desktop/qt.nix;
+        vlc = ./modules/desktop/vlc.nix;
         firefox = {
           imports = [
             inputs.arkenfox-nixos.hmModules.default
@@ -135,6 +136,7 @@
           self.homeManagerModules.kitty
           self.homeManagerModules.gtk
           self.homeManagerModules.qt
+          self.homeManagerModules.vlc
           self.homeManagerModules.firefox
           self.homeManagerModules.wayland
         ];

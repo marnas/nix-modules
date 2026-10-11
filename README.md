@@ -10,6 +10,7 @@ My neovim setup lives in its own flake: [nvim-flake](https://github.com/marnas/n
   - `cli` — fish, tmux (tilish + agent-indicator + usage widget), starship, bat, eza, yazi, zsh
   - `wayland` — Hyprland (split-monitor-workspaces), waybar, tofi, swaync, swayidle
   - `firefox` — [arkenfox](https://github.com/arkenfox/user.js)-hardened profile with telemetry off, privacy extensions preinstalled
+  - `vlc` — no first-run privacy prompt, network metadata lookups off, 3s arrow-key seeks
   - `alacritty`, `ghostty`, `kitty`, `gtk`, `qt`
 - **`packages`** — `tilish-colemak` (Colemak fork of tmux-tilish), `tmux-agent-indicator`, `claude-usage` (Claude usage-window widget for the tmux status bar), `claude-tasks` (live full-length view of Claude Code's task list, for a tmux side pane), `tailscale-exit` (Tailscale exit-node status/toggle/picker behind the waybar `custom/tailscale` module)
 - **`overlays`** — `additions` (the packages above), `stable-packages` (`pkgs.stable.*` escape hatch)

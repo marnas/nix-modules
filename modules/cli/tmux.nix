@@ -87,6 +87,11 @@ in
       # scrolled up to grab text. copy-pipe keeps scroll position; q/Esc exits.
       bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-pipe "${clipCmd}"
 
+      # Mouse wheel over the status bar cycles windows by default (previous-
+      # /next-window) — too easy to trigger by accident. Disable it.
+      unbind -n WheelUpStatus
+      unbind -n WheelDownStatus
+
       set-option -g focus-events on
 
       set-option -ga terminal-overrides ",${terminal}:Tc"

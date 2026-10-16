@@ -198,13 +198,20 @@ in
           match.class = ".*";
           idle_inhibit = "fullscreen";
         }
-        # Hide ghost XWayland window created by xembedsniproxy
+        # Hide the ghost 32x32 XWayland window xembedsniproxy uses to host
+        # XEmbed tray icons (Java/Wine apps). Older Hyprland exposed it with
+        # an empty class, 0.56 reports "xembedsniproxy" - match both.
+        # Invisible is not enough: it still counts as a window, so the
+        # workspace it lands on shows up occupied-but-empty in the bar. Park
+        # it on a special workspace nobody opens, without focus.
         {
           match = {
             xwayland = true;
-            class = "^$";
+            class = "^(xembedsniproxy)?$";
             title = "^$";
           };
+          workspace = "special:xembed silent";
+          no_focus = true;
           opacity = "0.0 override";
           no_blur = true;
           float = true;

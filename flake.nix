@@ -91,6 +91,7 @@
 
         # desktop
         alacritty = ./modules/desktop/alacritty.nix;
+        fusion360 = ./modules/desktop/fusion360.nix; # needs overlays.additions (Linux only)
         ghostty = ./modules/desktop/ghostty.nix;
         gtk = ./modules/desktop/gtk.nix; # needs overlays.stable-packages
         kitty = ./modules/desktop/kitty.nix;
@@ -138,6 +139,7 @@
           self.homeManagerModules.qt
           self.homeManagerModules.vlc
           self.homeManagerModules.firefox
+          self.homeManagerModules.fusion360
           self.homeManagerModules.wayland
         ];
       };

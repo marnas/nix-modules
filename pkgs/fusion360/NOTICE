@@ -1,0 +1,11 @@
+Third-party sources in this package (all MIT):
+
+- python/deployment.py, python/graphics.py, python/identity.py and the overall
+  Nix layout: lukasl-dev/fusion360.nix, commit 3d196a8ad251ebdcaae14afde7320d3022d30f45
+  (2026-10-02). Copyright (c) 2026 Lukas.
+- wine/*.patch and the prefix recipe in install.nix:
+  codeberg.org/Lolig4/Autodesk-Fusion-360-on-Linux (fork of cryinkfly's
+  installer), files/setup/data/fusion-patches at commit
+  7da442d6af5ac2619e5151475d2be54efe6170bc (2026-09-22).
+- fusion360.svg: codeberg.org/cryinkfly/Autodesk-Fusion-360-on-Linux,
+  files/setup/resource/graphics/autodesk_fusion.svg. Copyright (c) Steve Zabka.

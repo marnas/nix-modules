@@ -1,0 +1,60 @@
+Manage owned tool window popups, which Autodesk Fusion uses for its palettes.
+
+Wine maps "unmanaged" to X11 override-redirect, which tells the window manager
+and the compositor not to touch the window at all: no stacking, no focus
+handling, no WM_TRANSIENT_FOR. That is right for menus and tooltips, which live
+for the duration of a click.
+
+It is wrong for an owned WS_EX_TOOLWINDOW popup. That is a palette window. On
+Windows it stays above its owner but drops behind another application when that
+application is activated. Override-redirect makes that impossible, so Fusion's
+docked sidebar floats above every other window on the desktop instead.
+
+The rule is added as the last check in is_window_managed(), immediately before
+the default "return FALSE". Every window reaching that point is unmanaged in
+stock Wine, so the change can only flip unmanaged to managed and cannot alter
+the outcome for any window Wine already manages. WS_EX_APPWINDOW in particular
+keeps working.
+
+The second hunk gives owned tool windows _NET_WM_WINDOW_TYPE_UTILITY, which
+EWMH defines as "a small persistent utility window, such as a palette or
+toolbox". They previously got the dialog type, so window managers treated a
+palette as a dialog of its owner.
+
+This replaces wine-captionless-popups.patch, whose second hunk also made
+captionless WS_EX_APPWINDOW popups and popups that own popups unmanaged. The
+latter breaks make_owner_managed(): the owned window stays managed with
+WM_TRANSIENT_FOR pointing at an override-redirect owner.
+
+--- a/dlls/winex11.drv/window.c
++++ b/dlls/winex11.drv/window.c
+@@ -463,6 +463,10 @@
+     if (ex_style & WS_EX_APPWINDOW) return TRUE;
+     /* windows that own popups are managed */
+     if (has_owned_popups( hwnd )) return TRUE;
++    /* owned tool windows are palettes, they have to be stacked with their owner
++     * and to go behind other applications, which only the window manager can do */
++    if ((style & WS_POPUP) && (ex_style & WS_EX_TOOLWINDOW) &&
++        NtUserGetWindowRelative( hwnd, GW_OWNER )) return TRUE;
+     /* default: not managed */
+     return FALSE;
+ }
+@@ -1122,11 +1126,14 @@
+         group_leader = owner_win;
+     }
+ 
+-    /* Only use dialog type for owned popups. Metacity allows making fullscreen
+-     * only normal windows, and doesn't handle correctly TRANSIENT_FOR hint for
+-     * dialogs owned by fullscreen windows.
++    /* Owned tool windows are palettes and toolboxes, which is what the utility
++     * type is for. Only use dialog type for the other owned popups. Metacity
++     * allows making fullscreen only normal windows, and doesn't handle correctly
++     * TRANSIENT_FOR hint for dialogs owned by fullscreen windows.
+      */
+-    if (((style & WS_POPUP) || (ex_style & WS_EX_DLGMODALFRAME)) && owner)
++    if ((ex_style & WS_EX_TOOLWINDOW) && owner)
++        window_set_net_wm_window_type( data, XATOM__NET_WM_WINDOW_TYPE_UTILITY );
++    else if (((style & WS_POPUP) || (ex_style & WS_EX_DLGMODALFRAME)) && owner)
+         window_set_net_wm_window_type( data, XATOM__NET_WM_WINDOW_TYPE_DIALOG );
+     else
+         window_set_net_wm_window_type( data, XATOM__NET_WM_WINDOW_TYPE_NORMAL );

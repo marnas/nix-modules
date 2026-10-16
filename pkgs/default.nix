@@ -5,6 +5,7 @@
 {
   claude-tasks = pkgs.callPackage ./claude-tasks { };
   claude-usage = pkgs.callPackage ./claude-usage { };
+  fusion360 = pkgs.callPackage ./fusion360 { };
   tailscale-exit = pkgs.callPackage ./tailscale-exit { };
   tilish-colemak = pkgs.callPackage ./tilish-colemak { };
   tmux-agent-indicator = pkgs.callPackage ./tmux-agent-indicator { };

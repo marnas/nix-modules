@@ -1,0 +1,37 @@
+Fix RSA keys with public exponent 1, which Fusion 360 imports.
+
+Wine 11.11 moved rsaenh from libtomcrypt to SymCrypt. Fusion 360 imports a
+512-bit RSA private key whose public exponent is 1; with e == 1 both RSA
+operations are the identity (m^1 mod n == m), which libtomcrypt handled but
+SymCrypt rejected, so CryptImportKey failed and Fusion's 3D subsystem never
+initialised - the 3D canvas stayed black while the Qt interface worked.
+
+Wine commit 0cb249ce ("symcrypt: Accept RSA keys with public exponent 1")
+only commented out the guard in SymCryptRsakeyCalculatePrivateFields(). The
+import succeeds since then, but SymCryptIntExtendedGcd() computes the inverse
+as -((B1*Src1 - Gcd)/Src2) mod Src1, which does not hold for Src2 == 1, so the
+derived private exponent and both CRT exponents are wrong. The public
+operation is correct, the private one is not, and the canvas stays black.
+
+The inverse of 1 is 1, so set the private exponent directly; the CRT loop
+below then derives dp = dq = 1 as it should.
+
+diff --git a/libs/symcrypt/lib/rsakey.c b/libs/symcrypt/lib/rsakey.c
+--- a/libs/symcrypt/lib/rsakey.c
++++ b/libs/symcrypt/lib/rsakey.c
+@@ -423,6 +423,15 @@ SymCryptRsakeyCalculatePrivateFields(
+             goto cleanup;
+         }
+
++        // IntExtendedGcd computes the inverse as -((B1*Src1 - Gcd)/Src2) mod Src1,
++        // which does not hold for Src2 == 1. The inverse of 1 is 1, so set it
++        // directly; the CRT exponents derived below then come out as 1 as well.
++        if( pkRsakey->au64PubExp[i] == 1 )
++        {
++            SymCryptIntSetValueUint32( 1, pkRsakey->piPrivExps[i] );
++            continue;
++        }
++
+         // Calculate D
+         SymCryptIntSetValueUint64( pkRsakey->au64PubExp[i], piScr );
+

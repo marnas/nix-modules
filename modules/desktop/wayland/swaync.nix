@@ -11,6 +11,38 @@ let
   loginctl = "${pkgs.systemd}/bin/loginctl";
   notify-send = "${pkgs.libnotify}/bin/notify-send";
   swaync-client = lib.getExe' config.services.swaync.package "swaync-client";
+  pw-play = lib.getExe' pkgs.pipewire "pw-play";
+  cfg = config.nixModules.swaync;
+
+  # Notification sounds, macOS model: every notification plays the default
+  # sound, an app can bring its own (sound-file hint), the user can override
+  # or mute per app, and Do Not Disturb (Focus) silences everything. Runs
+  # from swaync's `scripts` hook with run-on=receive; swaync itself plays
+  # nothing and ignores DND for scripts, hence the check here. Precedence:
+  # per-app entry > sound-file hint > default. Always exits 0 so swaync's
+  # script-fail-notify stays quiet.
+  appSound = lib.concatStrings (
+    lib.mapAttrsToList (re: sound: ''
+      re=${lib.escapeShellArg re}
+      if [[ $SWAYNC_APP_NAME =~ $re ]]; then echo ${
+        if sound == null then "''" else lib.escapeShellArg "${sound}"
+      }; return 0; fi
+    '') cfg.sounds.apps
+  );
+  sound = pkgs.writeShellScript "cc-sound" ''
+    [ "$(${swaync-client} --get-dnd)" = true ] && exit 0
+    case "''${SWAYNC_HINT_SUPPRESS_SOUND:-}" in true | 1) exit 0 ;; esac
+    shopt -s nocasematch
+    app_sound() {
+      ${appSound}
+      return 1
+    }
+    file=${lib.escapeShellArg (if cfg.sounds.default == null then "" else "${cfg.sounds.default}")}
+    [ -r "''${SWAYNC_SOUND_FILE:-}" ] && file=$SWAYNC_SOUND_FILE
+    s=$(app_sound) && file=$s
+    [ -n "$file" ] && ${pw-play} --media-role=Notification "$file"
+    exit 0
+  '';
 
   # Click-to-focus: raise the window of the app that sent the notification.
   # Runs from swaync's `scripts` hook with run-on=action (any click on a
@@ -52,10 +84,29 @@ let
   '';
 in
 {
+  options.nixModules.swaync.sounds = {
+    enable = lib.mkEnableOption "macOS-style notification sounds, silenced by Do Not Disturb";
+    default = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = "Sound played for every notification without a more specific one.";
+    };
+    apps = lib.mkOption {
+      type = lib.types.attrsOf (lib.types.nullOr lib.types.path);
+      default = { };
+      example = lib.literalExpression ''{ "^ZapZap$" = ./message.oga; "^Claude Code$" = null; }'';
+      description = ''
+        Per-app overrides keyed by a case-insensitive bash regex on the
+        notification's app-name; null mutes the app. Checked in attribute
+        (alphabetical) order, first match wins.
+      '';
+    };
+  };
+
   # Notification daemon + control center (mako.nix is kept but not imported:
   # the two cannot coexist, both claim org.freedesktop.Notifications).
   # Toggled from the waybar custom/notification module (waybar.nix).
-  services.swaync = {
+  config.services.swaync = {
     enable = true;
     # Upstream has no "max panel height": the sheet is a GtkScrolledWindow
     # that, with control-center-height = 0, grows to its content and is only
@@ -118,9 +169,20 @@ in
       hide-on-action = true;
       keyboard-shortcuts = true;
       # No match keys = every notification; "action" = fired on click.
-      scripts.focus-source = {
-        exec = "${focus}";
-        run-on = "action";
+      # swaync runs only the first script matching both the notification and
+      # the run-on type, so the receive and action hooks don't shadow each
+      # other.
+      scripts = {
+        focus-source = {
+          exec = "${focus}";
+          run-on = "action";
+        };
+      }
+      // lib.optionalAttrs cfg.sounds.enable {
+        sound = {
+          exec = "${sound}";
+          run-on = "receive";
+        };
       };
       widgets = [
         "menubar"

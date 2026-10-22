@@ -6,7 +6,6 @@ let
   clipCmd =
     if pkgs.stdenv.hostPlatform.isDarwin then "pbcopy" else "${pkgs.wl-clipboard}/bin/wl-copy";
   tuiApps = [
-    "jellyfin-tui"
     "yazi"
     "lazygit"
     "btop"

@@ -120,6 +120,11 @@ in
       # agent dots + indicator + usage + host.
       set -g status-right-length 150
 
+      # tmux 3.8 changed the default window-status-current-style from
+      # "default" to "underscore", which underlines the active window name
+      # under minimal-tmux-status's current-format. Pin the old default.
+      set -g window-status-current-style default
+
       # prefix+T: Claude Code task list in a right side pane — every task, not
       # the five-row Ctrl+T view. Follows the most recently active session.
       bind T split-window -h -l 45 "${pkgs.claude-tasks}/bin/claude-tasks --follow"

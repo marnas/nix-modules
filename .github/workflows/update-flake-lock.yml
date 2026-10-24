@@ -20,8 +20,8 @@ jobs:
 
       - uses: cachix/install-nix-action@v31
         with:
-          # Only hits once the hyprland-nixpkgs pin in flake.nix is dropped;
-          # until then the hyprland stack builds from source (~20 min).
+          # Serves the hyprland stack; hyprland must not follow our nixpkgs or
+          # the cache is missed and the stack builds from source (~20 min).
           extra_nix_config: |
             extra-substituters = https://hyprland.cachix.org
             extra-trusted-public-keys = hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=

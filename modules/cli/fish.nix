@@ -42,8 +42,8 @@ in
       tf = mkIf hasTerraform "terraform";
 
       # Claude
-      c = "claude";
       ca = "claude --permission-mode auto";
+      co = "claude --model opus --permission-mode auto";
       cr = "claude --resume";
 
       # Git aliases

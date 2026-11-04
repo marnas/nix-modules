@@ -1,6 +1,12 @@
-{ lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   inherit (pkgs.stdenv.hostPlatform) isDarwin;
+  cfg = config.nixModules.vlc;
 
   # VLC records the first-run privacy answer in vlcrc, so without a declared
   # one every fresh or non-persistent home re-prompts. Read-only nix-store
@@ -19,16 +25,29 @@ let
     short-jump-size=3
   '';
 in
-lib.mkMerge [
-  {
-    home.packages = [ (if isDarwin then pkgs.vlc-bin-universal else pkgs.vlc) ];
-  }
-  # VLC 3's config dir: XDG on Linux, ~/Library/Preferences/<bundle id> on
-  # macOS (src/darwin/dirs.c).
-  (lib.mkIf isDarwin {
-    home.file."Library/Preferences/org.videolan.vlc/vlcrc".text = vlcrc;
-  })
-  (lib.mkIf (!isDarwin) {
-    xdg.configFile."vlc/vlcrc".text = vlcrc;
-  })
-]
+{
+  options.nixModules.vlc.package = lib.mkOption {
+    type = lib.types.nullOr lib.types.package;
+    default = if isDarwin then pkgs.vlc-bin-universal else pkgs.vlc;
+    defaultText = lib.literalExpression "if isDarwin then pkgs.vlc-bin-universal else pkgs.vlc";
+    description = ''
+      VLC package to install. null keeps only the config (vlcrc) side, for
+      hosts that install VLC another way (Homebrew cask on macOS, where the
+      cask tracks VideoLAN releases ahead of nixpkgs' vlc-bin).
+    '';
+  };
+
+  config = lib.mkMerge [
+    {
+      home.packages = lib.optional (cfg.package != null) cfg.package;
+    }
+    # VLC 3's config dir: XDG on Linux, ~/Library/Preferences/<bundle id> on
+    # macOS (src/darwin/dirs.c).
+    (lib.mkIf isDarwin {
+      home.file."Library/Preferences/org.videolan.vlc/vlcrc".text = vlcrc;
+    })
+    (lib.mkIf (!isDarwin) {
+      xdg.configFile."vlc/vlcrc".text = vlcrc;
+    })
+  ];
+}

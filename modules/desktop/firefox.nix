@@ -50,6 +50,13 @@ in
       # beats arkenfox 2651 (useDownloadDir=false, "always ask") in user.js.
       policies.DownloadDirectory = "${config.home.homeDirectory}/Downloads";
 
+      # macOS: Homebrew is the updater (brew upgrade --greedy). Left on,
+      # Firefox's own updater races it: it stages a build in ~/Library/Caches,
+      # then cannot write the admin-owned bundle and asks for admin credentials
+      # to install its privileged helper on every release. The nixpkgs build on
+      # Linux cannot self-update anyway, so this is harmless there.
+      policies.DisableAppUpdate = true;
+
       # Enable arkenfox privacy and security settings
       arkenfox = {
         enable = true;

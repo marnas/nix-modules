@@ -95,8 +95,8 @@ in
         pulseaudio = {
           format = "{icon} {volume}%";
           format-bluetooth = "{icon} {volume}% {format_source}";
-          format-bluetooth-muted = "󰖁 {icon} {format_source}";
-          format-muted = "󰖁";
+          format-bluetooth-muted = "󰖁 {volume}% {format_source}";
+          format-muted = "󰖁 {volume}%";
           format-icons = {
             headphone = "";
             default = [
@@ -175,6 +175,12 @@ in
         border: none;
         padding: 0 0;
         margin: 0 4px;
+      }
+
+      /* Muted keeps the same layout so the bar does not reflow; the state
+         shows as the dimmed grey used for separators and dnd. */
+      window .modules-right #pulseaudio.muted {
+        color: #727072;
       }
 
       window #custom-separator {

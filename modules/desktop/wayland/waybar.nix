@@ -95,8 +95,8 @@ in
         pulseaudio = {
           format = "{icon} {volume}%";
           format-bluetooth = "{icon} {volume}% {format_source}";
-          format-bluetooth-muted = " {icon} {format_source}";
-          format-muted = "婢";
+          format-bluetooth-muted = "󰖁 {icon} {format_source}";
+          format-muted = "󰖁";
           format-icons = {
             headphone = "";
             default = [
@@ -105,7 +105,9 @@ in
               "  "
             ];
           };
-          # on-click = pavucontrol;
+          # Mute toggle on the default sink; matches the XF86AudioMute bind
+          # (hyprland/binds.nix). Scrolling still adjusts the volume.
+          on-click = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
           tooltip = false;
         };
         clock = {

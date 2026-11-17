@@ -103,6 +103,17 @@ in
     };
   };
 
+  # GTK 4.24 (since 4.23.3) binds ext-background-effect-v1 on every surface
+  # and reports the blur region itself; for swaync that region is empty, and
+  # a CSS backdrop-filter on the sheet did not change that (tested with
+  # 4.24.0). Hyprland (0.57) lets a client's region override the `blur`
+  # layer rule, so the translucent sheet lost its frosted glass and became
+  # unreadable. Keep GTK off the protocol so the layer_rule in
+  # hyprland/default.nix decides again.
+  config.systemd.user.services.swaync.Service.Environment = [
+    "GDK_WAYLAND_DISABLE=ext_background_effect_manager_v1"
+  ];
+
   # Notification daemon + control center (mako.nix is kept but not imported:
   # the two cannot coexist, both claim org.freedesktop.Notifications).
   # Toggled from the waybar custom/notification module (waybar.nix).

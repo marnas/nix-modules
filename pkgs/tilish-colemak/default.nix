@@ -6,12 +6,12 @@
 tmuxPlugins.mkTmuxPlugin {
   pluginName = "tilish-colemak";
   rtpFilePath = "tilish.tmux";
-  version = "unstable-2023-05-12";
+  version = "unstable-2026-11-17";
   src = fetchFromGitHub {
     owner = "marnas";
     repo = "tmux-tilish-colemak";
-    rev = "304206474734db2d5b1e773697f83d40a449b833";
-    sha256 = "sha256-PIANPBgiABHFYhQ9crB2a3pqsVhSf9hzVWINQWzvTCE=";
+    rev = "218aee6317adb29001dbe2e577a80de5b3c80997";
+    sha256 = "sha256-mN4ZHrPlfQLQJbDAVnGzha6M6bB0ixhjIjX+7HbxeIk=";
   };
 
   meta = with lib; {
